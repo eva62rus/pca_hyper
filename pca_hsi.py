@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 DATA_DIR = './img/'
 FILE_EXT = '.tiff'
+N_COMPONENTS = 2
 
 
 
@@ -76,6 +77,21 @@ def concatenate_images(img_set):
 
 
 
+def plot_eigen_values(eigen_values, npoints):
+    vals = eigen_values[:npoints]
+    x = np.arange(0, len(vals), 1)
+    plt.plot(x, vals, marker = 'o')
+    plt.show()
+    
+
+
+
+def skl_pca(pca_input):
+    pca = PCA(n_components=N_COMPONENTS)
+    return pca.fit_transform(pca_input)
+
+
+
 @time_counter
 def main():
     # загрузка изображений
@@ -98,22 +114,24 @@ def main():
     indeces = np.arange(0, len(eigen_values), 1)
     indeces = [x for _, x in sorted(zip(eigen_values, indeces))]
     indeces = indeces[::-1]
+    # eigen_values1 = eigen_values[indeces]
+    # plot_eigen_values(eigen_values1, 10)
     eigen_vectors1 = eigen_vectors[:, indeces] 
     # извлечение трёх главных компонент
-    eigen_vectors1 = eigen_vectors1[:, :3]
+    eigen_vectors1 = eigen_vectors1[:, :N_COMPONENTS]
     # Матрица проекции собственных векторов
-    projection_matrix = (eigen_vectors.T[:][:3]).T
-    print(f'Projection matrix: {projection_matrix.shape}')
+    projection_matrix = (eigen_vectors.T[:][:N_COMPONENTS]).T
+    print(f'Projection matrix of eigen vectors: {projection_matrix.shape}')
     print(projection_matrix)
-   
+    with open('Projection_matrix.txt', 'w') as f:
+        f.write(str(projection_matrix))
+    # Проецирование исходных данных
+    pca_out = pca_input.dot(projection_matrix)
+    print(pca_out.shape)
 
 
- 
+
 
 if __name__ == '__main__':
     main()
 
-
-# pca = PCA(n_components=2)
-# out_data = pca.fit_transform(pca_input)
-# print(f'out data shape: {out_data.shape}')
