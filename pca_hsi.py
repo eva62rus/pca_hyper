@@ -85,6 +85,17 @@ def plot_eigen_values(eigen_values, npoints):
     
 
 
+def plot_projected_data(projected_data, title=None):
+    plt.figure(figsize=(8, 6))
+    scatter = plt.scatter(projected_data[:, 0], projected_data[:, 1])
+    plt.legend(handles=scatter.legend_elements()[0], loc="upper left")
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    if title is not None:
+        plt.title(title)
+    plt.show()
+
+
 
 def skl_pca(pca_input):
     pca = PCA(n_components=N_COMPONENTS)
@@ -117,7 +128,7 @@ def main():
     # eigen_values1 = eigen_values[indeces]
     # plot_eigen_values(eigen_values1, 10)
     eigen_vectors1 = eigen_vectors[:, indeces] 
-    # извлечение трёх главных компонент
+    # извлечение N_COMPONENTS главных компонент
     eigen_vectors1 = eigen_vectors1[:, :N_COMPONENTS]
     # Матрица проекции собственных векторов
     projection_matrix = (eigen_vectors.T[:][:N_COMPONENTS]).T
@@ -128,7 +139,11 @@ def main():
     # Проецирование исходных данных
     pca_out = pca_input.dot(projection_matrix)
     print(pca_out.shape)
-
+    plot_projected_data(pca_out, 'numpy version')
+    # Проверка с sklearn
+    pca = PCA(2)
+    pca_out_1 = pca.fit_transform(pca_input)
+    plot_projected_data(pca_out_1, 'sklearn version')
 
 
 
